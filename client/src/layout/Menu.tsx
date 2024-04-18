@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 export default function Menu(): ReactElement {
     return (
         <header>
-          <Link to='/'><h1 className='no-wrap'>Financial Tracker</h1></Link>
+          <Link to='/'><h1 className='no-wrap'>Reach</h1></Link>
           <nav>
               <ul>
                   <li>

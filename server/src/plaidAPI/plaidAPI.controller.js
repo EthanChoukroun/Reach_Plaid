@@ -81,6 +81,25 @@ async function exchangeForAccessToken(request, response, next) {
       .catch(next);
   };
 
+  function formatTransactions(transactions) {
+    const formattedData = transactions.map(transaction => {
+        const primaryCategory = transaction.category[0]; // Assuming the first category is the primary
+        return {
+            date: transaction.date,
+            category: primaryCategory,
+            amount: transaction.amount
+        };
+    });
+
+    // Preparing data to be sent to a Python script
+    const dataForPython = JSON.stringify(formattedData);
+
+    // You could write this string to a file or directly send it through an inter-process communication
+    console.log(dataForPython);
+}
+
+
+
 async function getTransactions(req, res, next) {
   const accessToken = process.env.ACCESS_TOKEN;
   // using separate function/file to get correct dates for today and 30 days ago
@@ -113,7 +132,9 @@ async function getTransactions(req, res, next) {
         paginatedResponse.data.transactions,
       );
     }
-    await res.json(transactions)
+    await res.json(transactions);
+    const formattedTransaction = formatTransactions(transactions);
+    console.log(formattedTransaction);
   } catch(err) {
     console.error(err);
   }

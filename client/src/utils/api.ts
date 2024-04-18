@@ -62,5 +62,6 @@ export const getTransactions = async (signal): Promise<Transaction[]> => {
         signal
     }
     const response = await fetch(url, options);
+    console.log(response);
     return response.json();
 }
