@@ -83,7 +83,9 @@ async function exchangeForAccessToken(request, response, next) {
 
   function formatTransactions(transactions) {
     const formattedData = transactions.map(transaction => {
-        const primaryCategory = transaction.category[0]; // Assuming the first category is the primary
+        // Check if transaction.category is not null and has at least one element
+        const primaryCategory = transaction.category && transaction.category.length > 0 ? transaction.category[0] : "Uncategorized";
+
         return {
             date: transaction.date,
             category: primaryCategory,
@@ -96,7 +98,27 @@ async function exchangeForAccessToken(request, response, next) {
 
     // You could write this string to a file or directly send it through an inter-process communication
     console.log(dataForPython);
-}
+};
+
+function parseAccountData(accounts) {
+  const output = {
+      accounts: [],
+      total_current_balance: 0
+  };
+
+  accounts.forEach(account => {
+      // Extracting the account ID and the current balance from each account
+      const { account_id, balances: { current } } = account;
+
+      // Adding the account details to the accounts array in the output
+      output.accounts.push({ account_id, current_balance: current });
+
+      // Summing up the current balances to calculate the total current balance
+      output.total_current_balance += current;
+  });
+
+  return output;
+};
 
 
 
@@ -138,7 +160,43 @@ async function getTransactions(req, res, next) {
   } catch(err) {
     console.error(err);
   }
-}
+
+  const requestBalance = {
+    access_token: accessToken,
+  };
+  try {
+    const responseBalance = await plaidClient.accountsBalanceGet(requestBalance);
+    const accounts = responseBalance.data.accounts;
+    const formattedBalance = parseAccountData(accounts);
+    console.log(formattedBalance);
+  } catch(err) {
+    console.log(err);
+  };
+
+  const requestUserIncome = {
+    client_user_id: process.env.PLAID_CLIENT_ID
+  };
+  try {
+    const responseUser = await plaidClient.userCreate(requestUserIncome);
+    console.log(responseUser)
+  } catch(err) {
+    console.log(err);
+  };
+
+  const requestIncome = {
+    user_token: responseUser['user_token'],
+    options: {
+      count: 1,
+    },
+  };
+  try {
+    const responseIncome = await client.creditBankIncomeGet(request)
+    console.log(responseIncome)
+  } catch(err) {
+    console.log(err)
+  }
+
+};
 
 module.exports = {
     generateLinkToken: asyncErrorBoundary(generateLinkToken),

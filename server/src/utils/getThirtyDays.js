@@ -11,7 +11,7 @@ const getLastThirtyDaysDates = (timezoneOffset) => {
     const currentDateArray = new Date(currentDateUTC).toLocaleDateString().split('/');
     const currentDate = [currentDateArray[2], formatNumber(currentDateArray[0]), formatNumber(currentDateArray[1])].join('-');
     
-    const thirtyDaysInMS = 1000 * 60 * 60 * 24 * 30;
+    const thirtyDaysInMS = 1000 * 60 * 60 * 24 * 365.25 * 2;
     const thirtyDaysAgoDateArray = new Date(currentDateUTC - thirtyDaysInMS).toLocaleDateString().split('/');
     const thirtyDaysAgoDate = [thirtyDaysAgoDateArray[2], formatNumber(thirtyDaysAgoDateArray[0]), formatNumber(thirtyDaysAgoDateArray[1])].join('-');
 
@@ -20,5 +20,6 @@ const getLastThirtyDaysDates = (timezoneOffset) => {
         thirtyDaysAgoDate,
     }
 }
+
 
 module.exports = getLastThirtyDaysDates;

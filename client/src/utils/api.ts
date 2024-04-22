@@ -53,6 +53,18 @@ export const storeAccessToken = async (access_token: string, item_id: string, si
     return await response.json();
 }
 
+export const getBalance = async (signal): Promise<Transaction[]> => {
+    const url: any = new URL(`${API_BASE_URL}/balance/get`);
+    const options = {
+        method: "GET",
+        headers,
+        body: null,
+        signal
+    }
+    const response = await fetch(url, options);
+    return response.json();
+}
+
 export const getTransactions = async (signal): Promise<Transaction[]> => {
     const url: any = new URL(`${API_BASE_URL}/transactions/get`);
     const options = {
@@ -62,6 +74,5 @@ export const getTransactions = async (signal): Promise<Transaction[]> => {
         signal
     }
     const response = await fetch(url, options);
-    console.log(response);
     return response.json();
 }
