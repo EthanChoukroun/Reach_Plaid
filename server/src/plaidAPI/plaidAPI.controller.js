@@ -173,28 +173,28 @@ async function getTransactions(req, res, next) {
     console.log(err);
   };
 
-  const requestUserIncome = {
-    client_user_id: process.env.PLAID_CLIENT_ID
-  };
-  try {
-    const responseUser = await plaidClient.userCreate(requestUserIncome);
-    console.log(responseUser)
-  } catch(err) {
-    console.log(err);
-  };
+  // const requestUserIncome = {
+  //   client_user_id: process.env.PLAID_CLIENT_ID
+  // };
+  // try {
+  //   const responseUser = await plaidClient.userCreate(requestUserIncome);
+  //   console.log(responseUser)
+  // } catch(err) {
+  //   console.log(err);
+  // };
 
-  const requestIncome = {
-    user_token: responseUser['user_token'],
-    options: {
-      count: 1,
-    },
-  };
-  try {
-    const responseIncome = await client.creditBankIncomeGet(request)
-    console.log(responseIncome)
-  } catch(err) {
-    console.log(err)
-  }
+  // const requestIncome = {
+  //   user_token: responseUser['user_token'],
+  //   options: {
+  //     count: 1,
+  //   },
+  // };
+  // try {
+  //   const responseIncome = await client.creditBankIncomeGet(request)
+  //   console.log(responseIncome)
+  // } catch(err) {
+  //   console.log(err)
+  // }
 
 };
 
