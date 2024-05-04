@@ -19,7 +19,7 @@ def expose_ref_status():
    })
 
 
-@app.route('/')
+# @app.route('/')
     
 if __name__ == '__main__':
   print("__main__")
