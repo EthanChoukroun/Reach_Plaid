@@ -3,10 +3,23 @@ from flask import Flask, jsonify
 
 app = Flask(__name__)
 
-@app.route('/', methods=['GET'])
+@app.route('/smart_budget', methods=['GET'])
 def expose_endpoint():
-    return jsonify({"smart_budget": 40})
-    
+    return jsonify({
+       "smart_budget": 40,
+       "updated": False,
+       "spending_status": 2
+       })
+
+@app.route('/ref_status', methods=['GET'])
+def expose_ref_status():
+   return jsonify({
+      'first_ref_status': 'done',
+      'second_ref_status': 'done'
+   })
+
+
+@app.route('/')
     
 if __name__ == '__main__':
   print("__main__")
