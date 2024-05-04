@@ -18,8 +18,12 @@ def expose_ref_status():
       'second_ref_status': 'done'
    })
 
-
-# @app.route('/')
+@app.route('/initial_status', methods=['GET'])
+def expose_initial_status():
+   return jsonify({
+      'saving_predictions': 5250,
+      'saving_rate_increase': 3
+   })
     
 if __name__ == '__main__':
   print("__main__")
