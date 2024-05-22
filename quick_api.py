@@ -24,22 +24,29 @@ def expose_initial_status():
       'saving_rate_increase': 3
    })
 
+
 @app.route('/referral_code', methods=['POST'])
 def submit_code():
     try:
-        # Ensure that the request contains JSON data
         if request.is_json:
             data = request.get_json()
             code = data.get('code')
-            if not code:
-                return jsonify({"error": "No code provided"}), 400
-            print(f"Received code: {code}")
-            return jsonify({"code_referral": 1}), 200
+        elif request.content_type == 'application/x-www-form-urlencoded':
+            data = request.form
+            code = data.get('code')
         else:
-            return jsonify({"error": "Invalid content type, expecting application/json"}), 400
+            return jsonify({"error": "Invalid content type, expecting application/json or application/x-www-form-urlencoded"}), 400
+        
+        if not code:
+            return jsonify({"error": "No code provided"}), 400
+
+        print(f"Received code: {code}")
+        return jsonify({"code_referral": 1}), 200
+
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"error": str(e)}), 500
+
 
 @app.route('/referral_code_confirmation', methods=["GET"])
 def referral_code_confirmation():
