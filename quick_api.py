@@ -34,7 +34,7 @@ def submit_code():
             if not code:
                 return jsonify({"error": "No code provided"}), 400
             print(f"Received code: {code}")
-            return jsonify({"message": "Code received and printed to console"}), 200
+            return jsonify({"code_referral": 1}), 200
         else:
             return jsonify({"error": "Invalid content type, expecting application/json"}), 400
     except Exception as e:
@@ -98,6 +98,11 @@ def thirty_saving_prog():
 @app.route('/thirty_saving', methods=["GET"])
 def thirty_saving():
    return jsonify({'value': 5600})
+
+@app.route('/list_goals', methods=['GET'])
+def lizt_goal():
+    return jsonify({'goals': ['1', '2']})
+
 
 
 if __name__ == '__main__':
