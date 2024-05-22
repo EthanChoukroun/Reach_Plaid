@@ -104,7 +104,7 @@ def get_ref_code():
 
 @app.route('/user_behavior', methods=["GET"])
 def user_behavior():
-   return jsonify({'response': 1})
+   return jsonify({'user_behavior': 1})
 
 @app.route('/thirty_saving_prog', methods=["GET"])
 def thirty_saving_prog():
