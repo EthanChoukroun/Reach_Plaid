@@ -108,7 +108,7 @@ def user_behavior():
 
 @app.route('/thirty_saving_prog', methods=["GET"])
 def thirty_saving_prog():
-   return jsonify({'response': 0.56})
+   return jsonify({'Thirsty_Days_savings_Progression': 0.56})
 
 @app.route('/thirty_saving', methods=["GET"])
 def thirty_saving():
