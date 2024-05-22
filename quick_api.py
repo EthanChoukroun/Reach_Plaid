@@ -50,7 +50,10 @@ def submit_code():
 
 @app.route('/referral_code_confirmation', methods=["GET"])
 def referral_code_confirmation():
-   return jsonify({'Referral_code_confirmation': 1})
+    override = request.args.get('override', type=int)
+    if override == 0:
+        return jsonify({'Referral_code_confirmation': 0})
+    return jsonify({'Referral_code_confirmation': 1})
 
 @app.route('/user_name', methods=['POST'])
 def user_name():
