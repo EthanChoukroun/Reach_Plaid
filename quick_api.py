@@ -100,10 +100,89 @@ def thirty_saving():
    return jsonify({'value': 5600})
 
 @app.route('/list_goals', methods=['GET'])
-def lizt_goal():
+def list_goal():
     return jsonify({'goals': ['1', '2']})
 
+@app.route('/new_goal', methods=['POST'])
+def new_goal():
+    try:
+        # Ensure that the request contains JSON data
+        if request.is_json:
+            data = request.get_json()
+            code = data.get('goal')
+            if not code:
+                return jsonify({"error": "No saving provided"}), 400
+            print(f"Received user_name: {code}")
+            return jsonify({"message": "goal received and printed to console"}), 200
+        else:
+            return jsonify({"error": "Invalid content type, expecting application/json"}), 400
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": str(e)}), 500
+    
+@app.route('/check_eta', methods=['GET'])
+def check_eta():
+    return jsonify({'eta': 1})
 
+@app.route('/check_goal', methods=['GET'])
+def check_goal():
+  try:
+          # Ensure that the request contains JSON data
+      if request.is_json:
+          data = request.get_json()
+          code = data.get('goal')
+          if not code:
+              return jsonify({"error": "No saving provided"}), 400
+          print(f"Received user_name: {code}")
+          return jsonify({"confirmation":1}), 200
+      else:
+          return jsonify({"error": "Invalid content type, expecting application/json"}), 400
+  except Exception as e:
+      print(f"Error: {e}")
+      return jsonify({"error": str(e)}), 500
+  
+@app.route('/get_eta', methods=['GET'])
+def get_eta():
+  try:
+          # Ensure that the request contains JSON data
+      if request.is_json:
+          data = request.get_json()
+          code = data.get('goal')
+          if not code:
+              return jsonify({"error": "No goal provided"}), 400
+          print(f"Received user_name: {code}")
+          return jsonify({"eta":"2024-05-01"}), 200
+      else:
+          return jsonify({"error": "Invalid content type, expecting application/json"}), 400
+  except Exception as e:
+      print(f"Error: {e}")
+      return jsonify({"error": str(e)}), 500
+          
+@app.route('/cancel_goal', methods=['POST'])
+def cancel_goal():
+  try:
+          # Ensure that the request contains JSON data
+      if request.is_json:
+          data = request.get_json()
+          code = data.get('goal')
+          if not code:
+              return jsonify({"error": "No goal provided"}), 400
+          print(f"Received user_name: {code}")
+          return jsonify({"confirmation": 1}), 200
+      else:
+          return jsonify({"error": "Invalid content type, expecting application/json"}), 400
+  except Exception as e:
+      print(f"Error: {e}")
+      return jsonify({"error": str(e)}), 500
+  
+
+@app.route('/delete_account', methods=['POST'])
+def delete_account():
+  return jsonify({'confirmation': 1})
+
+@app.route('/weekly_audit', methods=['GET'])
+def weekly_audit():
+    return jsonify({'data': 500})
 
 if __name__ == '__main__':
   print("__main__")
