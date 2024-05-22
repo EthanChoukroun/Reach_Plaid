@@ -58,16 +58,21 @@ def referral_code_confirmation():
 @app.route('/user_name', methods=['POST'])
 def user_name():
     try:
-        # Ensure that the request contains JSON data
         if request.is_json:
             data = request.get_json()
             code = data.get('code')
-            if not code:
-                return jsonify({"error": "No code provided"}), 400
-            print(f"Received user_name: {code}")
-            return jsonify({"message": "user_name received and printed to console"}), 200
+        elif request.content_type == 'application/x-www-form-urlencoded':
+            data = request.form
+            code = data.get('code')
         else:
-            return jsonify({"error": "Invalid content type, expecting application/json"}), 400
+            return jsonify({"error": "Invalid content type, expecting application/json or application/x-www-form-urlencoded"}), 400
+        
+        if not code:
+            return jsonify({"error": "No code provided"}), 400
+
+        print(f"Received code: {code}")
+        return jsonify({"response": 1}), 200
+
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"error": str(e)}), 500
