@@ -41,7 +41,7 @@ def submit_code():
             return jsonify({"error": "No code provided"}), 400
 
         print(f"Received code: {code}")
-        return jsonify({"code_referral": 1}), 200
+        return jsonify({"response": 1}), 200
 
     except Exception as e:
         print(f"Error: {e}")
@@ -58,7 +58,7 @@ def user_name():
         # Ensure that the request contains JSON data
         if request.is_json:
             data = request.get_json()
-            code = data.get('user_name')
+            code = data.get('code')
             if not code:
                 return jsonify({"error": "No code provided"}), 400
             print(f"Received user_name: {code}")
@@ -75,7 +75,7 @@ def saving_capacity():
         # Ensure that the request contains JSON data
         if request.is_json:
             data = request.get_json()
-            code = data.get('saving_capacity')
+            code = data.get('code')
             if not code:
                 return jsonify({"error": "No saving provided"}), 400
             print(f"Received user_name: {code}")
@@ -88,27 +88,27 @@ def saving_capacity():
 
 @app.route('/plaid_status', methods=["GET"])
 def plaid_status():
-   return jsonify({'ok': 1})
+   return jsonify({'response': 1})
 
 @app.route('/get_ref_code', methods=["GET"])
 def get_ref_code():
-   return jsonify({'code': 1717})
+   return jsonify({'response': 1717})
 
 @app.route('/user_behavior', methods=["GET"])
 def user_behavior():
-   return jsonify({'value': 1})
+   return jsonify({'response': 1})
 
 @app.route('/thirty_saving_prog', methods=["GET"])
 def thirty_saving_prog():
-   return jsonify({'value': 0.56})
+   return jsonify({'response': 0.56})
 
 @app.route('/thirty_saving', methods=["GET"])
 def thirty_saving():
-   return jsonify({'value': 5600})
+   return jsonify({'response': 5600})
 
 @app.route('/list_goals', methods=['GET'])
 def list_goal():
-    return jsonify({'goals': ['1', '2']})
+    return jsonify({'response': ['1', '2']})
 
 @app.route('/new_goal', methods=['POST'])
 def new_goal():
@@ -116,11 +116,13 @@ def new_goal():
         # Ensure that the request contains JSON data
         if request.is_json:
             data = request.get_json()
-            code = data.get('goal')
-            if not code:
+            code_name = data.get('code_name')
+            code_eta = data.get('code_eta')
+            code_amount = data.get('code_amount')
+            if not code_name:
                 return jsonify({"error": "No saving provided"}), 400
-            print(f"Received user_name: {code}")
-            return jsonify({"message": "goal received and printed to console"}), 200
+            print(f"Received user_name: {code_name}")
+            return jsonify({"response": "goal received and printed to console"}), 200
         else:
             return jsonify({"error": "Invalid content type, expecting application/json"}), 400
     except Exception as e:
@@ -129,41 +131,15 @@ def new_goal():
     
 @app.route('/check_eta', methods=['GET'])
 def check_eta():
-    return jsonify({'eta': 1})
+    return jsonify({'response': 1})
 
 @app.route('/check_goal', methods=['GET'])
 def check_goal():
-  try:
-          # Ensure that the request contains JSON data
-      if request.is_json:
-          data = request.get_json()
-          code = data.get('goal')
-          if not code:
-              return jsonify({"error": "No saving provided"}), 400
-          print(f"Received user_name: {code}")
-          return jsonify({"confirmation":1}), 200
-      else:
-          return jsonify({"error": "Invalid content type, expecting application/json"}), 400
-  except Exception as e:
-      print(f"Error: {e}")
-      return jsonify({"error": str(e)}), 500
+  return jsonify({'response': 1})
   
 @app.route('/get_eta', methods=['GET'])
 def get_eta():
-  try:
-          # Ensure that the request contains JSON data
-      if request.is_json:
-          data = request.get_json()
-          code = data.get('goal')
-          if not code:
-              return jsonify({"error": "No goal provided"}), 400
-          print(f"Received user_name: {code}")
-          return jsonify({"eta":"2024-05-01"}), 200
-      else:
-          return jsonify({"error": "Invalid content type, expecting application/json"}), 400
-  except Exception as e:
-      print(f"Error: {e}")
-      return jsonify({"error": str(e)}), 500
+    return jsonify({"response": "2025-01-01"})
           
 @app.route('/cancel_goal', methods=['POST'])
 def cancel_goal():
@@ -171,7 +147,7 @@ def cancel_goal():
           # Ensure that the request contains JSON data
       if request.is_json:
           data = request.get_json()
-          code = data.get('goal')
+          code = data.get('code')
           if not code:
               return jsonify({"error": "No goal provided"}), 400
           print(f"Received user_name: {code}")
@@ -185,11 +161,11 @@ def cancel_goal():
 
 @app.route('/delete_account', methods=['POST'])
 def delete_account():
-  return jsonify({'confirmation': 1})
+  return jsonify({'response': 1})
 
 @app.route('/weekly_audit', methods=['GET'])
 def weekly_audit():
-    return jsonify({'data': 500})
+    return jsonify({'response': 500})
 
 if __name__ == '__main__':
   print("__main__")
