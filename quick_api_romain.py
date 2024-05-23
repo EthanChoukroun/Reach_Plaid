@@ -157,7 +157,8 @@ def check_eta():
 
 @app.route('/check_goal', methods=['GET'])
 def check_goal():
-  return jsonify({'Savings_Goal_ETA_Check': 1})
+  return jsonify({'Savings_Goal_ETA_Check': '2025-01-01',
+                  'Savings_Goal_ETA_Check_days': 100})
   
 @app.route('/get_eta', methods=['GET'])
 def get_eta():
