@@ -88,7 +88,7 @@ def saving_capacity():
                 return jsonify({"error": "No saving provided"}), 400
         elif request.content_type == 'application/x-www-form-urlencoded':
             data = request.form
-            code = data.get('code')
+            code = data.get('code_capability')
             if not code:
                 return jsonify({"error": "No saving provided"}), 400
             print(f"Received user_name: {code}")
