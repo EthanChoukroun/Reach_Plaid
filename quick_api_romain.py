@@ -129,6 +129,8 @@ def new_goal():
             code_amount = data.get('code_amount')
             if not code_name:
                 return jsonify({"error": "No saving provided"}), 400
+            elif not code_eta:
+                return jsonify({'eta_response': 'Your ETA is 2025-01-01'}), 200
             print(f"Received user_name: {code_name}")
             return jsonify({"response": "goal received and printed to console"}), 200
         else:
@@ -164,8 +166,7 @@ def cancel_goal():
           return jsonify({"error": "Invalid content type, expecting application/json"}), 400
   except Exception as e:
       print(f"Error: {e}")
-      return jsonify({"error": str(e)}), 500
-  
+      return jsonify({"error": str(e)})
 
 @app.route('/delete_account', methods=['POST'])
 def delete_account():
