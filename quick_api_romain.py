@@ -86,6 +86,11 @@ def saving_capacity():
             code = data.get('code')
             if not code:
                 return jsonify({"error": "No saving provided"}), 400
+        elif request.content_type == 'application/x-www-form-urlencoded':
+            data = request.form
+            code = data.get('code')
+            if not code:
+                return jsonify({"error": "No saving provided"}), 400
             print(f"Received user_name: {code}")
             return jsonify({"message": "saving capacity received and printed to console"}), 200
         else:
