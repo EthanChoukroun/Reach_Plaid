@@ -139,11 +139,11 @@ def new_goal():
     
 @app.route('/check_eta', methods=['GET'])
 def check_eta():
-    return jsonify({'Savings_Goal_ETA_Check': 1})
+    return jsonify({'ETA_format': 1})
 
 @app.route('/check_goal', methods=['GET'])
 def check_goal():
-  return jsonify({'ETA_format': 1})
+  return jsonify({'Savings_Goal_ETA_Check': 1})
   
 @app.route('/get_eta', methods=['GET'])
 def get_eta():
