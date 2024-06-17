@@ -70,40 +70,36 @@ async function exchangeForAccessToken(request, response, next) {
   const { public_token, phoneNumber } = request.body;
   Promise.resolve()
     .then(async function () {
-      const tokenResponse = await plaidClient.itemPublicTokenExchange({
-        public_token,
-      });
-      const ACCESS_TOKEN = tokenResponse.data.access_token;
-      const ITEM_ID = tokenResponse.data.item_id;
-      // if (PLAID_PRODUCTS.includes('transfer')) {
-      //   TRANSFER_ID = await authorizeAndCreateTransfer(ACCESS_TOKEN);
-      // }
-      const token = await new AccessToken({
-        access_token: ACCESS_TOKEN,
-        item_id: ITEM_ID,
-        session_id: request.cookies.sessionid,
-        phone: phoneNumber,
-      });
-
       try {
+        const tokenResponse = await plaidClient.itemPublicTokenExchange({
+          public_token,
+        });
+        const ACCESS_TOKEN = tokenResponse.data.access_token;
+        const ITEM_ID = tokenResponse.data.item_id;
+
+        let transactions = await fetchTransations(ACCESS_TOKEN);
+        let { smartBudget } = await getBudget(transactions);
+
+        const token = await new AccessToken({
+          access_token: ACCESS_TOKEN,
+          item_id: ITEM_ID,
+          session_id: request.cookies.sessionid,
+          phone: phoneNumber,
+          smart_budget: String(smartBudget),
+        });
+
         const newToken = await token.save();
-        console.log(newToken);
-        // console.log(process.memoryUsage().heapUsed / 1024 / 1024);
+        await sendBudgetMessage(smartBudget, phoneNumber);
+
+        response.json({
+          access_token: ACCESS_TOKEN,
+          item_id: ITEM_ID,
+          phoneNumber: phoneNumber,
+          error: null,
+        });
       } catch (err) {
         console.log(err);
       }
-
-      let transactions = await fetchTransations(request.cookies.sessionid);
-      let { smartBudget } = await getBudget(transactions);
-
-      await sendBudgetMessage(smartBudget, phoneNumber);
-
-      response.json({
-        access_token: ACCESS_TOKEN,
-        item_id: ITEM_ID,
-        phoneNumber: phoneNumber,
-        error: null,
-      });
     })
     .catch(next);
 }
@@ -153,16 +149,13 @@ function parseAccountData(accounts) {
   return output;
 }
 
-async function fetchTransations(session_id) {
+async function fetchTransations(access_token) {
   const { currentDate, thirtyDaysAgoDate } = getLastThirtyDaysDates(
     process.env.TIMEZONE_OFFSET
   );
-  const accessTokenObj = await AccessToken.findOne({
-    session_id,
-  });
 
   const request = {
-    access_token: accessTokenObj.access_token,
+    access_token: access_token,
     start_date: thirtyDaysAgoDate,
     end_date: currentDate,
   };
@@ -177,7 +170,7 @@ async function fetchTransations(session_id) {
     while (transactions.length < total_transactions) {
       const paginatedRequest = {
         // const paginatedRequest: TransactionsGetRequest = {
-        access_token: accessTokenObj.access_token,
+        access_token: access_token,
         start_date: thirtyDaysAgoDate,
         end_date: currentDate,
         options: {
@@ -196,11 +189,12 @@ async function fetchTransations(session_id) {
 }
 
 async function getTransactions(req, res, next) {
-  // const accessToken = process.env.ACCESS_TOKEN;
-  // using separate function/file to get correct dates for today and 30 days ago
   try {
-    let transactions = await fetchTransations(req.cookies.sessionid);
-    getBudget(transactions);
+    let session_id = req.cookies.sessionid;
+    const accessTokenObj = await AccessToken.findOne({
+      session_id,
+    });
+    let transactions = await fetchTransations(accessTokenObj.access_token);
     res.json(transactions);
     // const formattedTransaction = formatTransactions(transactions);
     // console.log(formattedTransaction);

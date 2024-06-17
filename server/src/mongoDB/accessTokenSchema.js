@@ -1,7 +1,10 @@
 require("dotenv").config();
 
 const mongoose = require("mongoose");
-mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true });
+mongoose.connect(process.env.DATABASE_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 const db = mongoose.connection;
 db.on("error", (error) => console.error(error));
 db.once("open", () => console.log("Connected to database!"));
@@ -31,8 +34,13 @@ const accessTokenSchema = new mongoose.Schema({
     type: Date,
     required: true,
     default: Date.now,
-    expires: 3600,
+  },
+  smart_budget: {
+    type: String,
+    required: true,
   },
 });
+
+accessTokenSchema.index({ created_date: 1 }, { expireAfterSeconds: 86400 });
 
 module.exports = mongoose.model("accessToken", accessTokenSchema);

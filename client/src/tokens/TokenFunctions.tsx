@@ -52,9 +52,9 @@ export default function TokenFunctions({
             abortController.signal
           )
             .then(async (accessTokenObj) => {
-              console.log(accessTokenObj);
               setAccessTokenObj(accessTokenObj);
               setAuthorisedUser(true);
+              window.location.href = "https://wa.me/14155238886";
             })
             .catch((error) => console.error(error));
         }
