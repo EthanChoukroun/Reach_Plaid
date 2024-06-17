@@ -12,6 +12,7 @@ export const generateLinkToken = async (signal): Promise<string> => {
         method: "POST",
         headers,
         body: JSON.stringify({ timezoneOffset }),
+        credentials: "include",
         signal
     });
     const { link_token: linkToken } = await response.json();
@@ -19,7 +20,7 @@ export const generateLinkToken = async (signal): Promise<string> => {
 }
 
 // adjust to use api endpoint found within documentation...
-export const exchangeForAccessToken = async (public_token: string, signal): Promise<AccessTokenObj> => {
+export const exchangeForAccessToken = async (public_token: string, phoneNumber: string, signal): Promise<AccessTokenObj> => {
     const url: any = new URL(`${API_BASE_URL}/item/public_token/exchange`);
     // const url: any = new URL(`${API_BASE_URL}/api/set_access_token`);
     const response = await fetch(url, {
@@ -27,7 +28,8 @@ export const exchangeForAccessToken = async (public_token: string, signal): Prom
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({public_token}),
+        body: JSON.stringify({public_token, phoneNumber}),
+        credentials: "include",
         signal
     })
     // console.log(JSON.stringify({data: public_token}))
@@ -67,12 +69,30 @@ export const getBalance = async (signal): Promise<Transaction[]> => {
 
 export const getTransactions = async (signal): Promise<Transaction[]> => {
     const url: any = new URL(`${API_BASE_URL}/transactions/get`);
-    const options = {
+    const response = await fetch(url, {
         method: "GET",
         headers,
         body: null,
-        signal
-    }
-    const response = await fetch(url, options);
+        signal,
+        credentials: "include"
+    });
     return response.json();
+}
+
+export const fetchSession = async (signal) : Promise<any> => {
+    const url: any = new URL(`${API_BASE_URL}/session`);
+    const response = await fetch(url, {
+        method: "GET",
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: "include",
+        signal
+    })
+    if (response.status == 200) {
+        const data = await response.json()
+        return {data: data}
+    } else {
+        return {error: "Unauthorized User"}
+    }
 }
