@@ -9,7 +9,6 @@ interface Prop {
 export default function DisplayTransactions({ accounts }: Prop): ReactElement {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  console.log(transactions);
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -42,11 +41,11 @@ export default function DisplayTransactions({ accounts }: Prop): ReactElement {
 
     return (
       <tr key={transaction_id}>
-        <td>{accountFound ? accountFound.name : "N/A"}</td>
-        <td className="no-wrap">{date}</td>
-        <td>{merchant_name ? merchant_name : "N/A"}</td>
         <td>{name}</td>
-        <td>{category.join(", ")}</td>
+        <td className="no-wrap">{date}</td>
+        {/* <td>{merchant_name ? merchant_name : "N/A"}</td> */}
+        {/* <td>{name}</td> */}
+        <td>{category}</td>
         <td className="no-wrap">${amount.toFixed(2)}</td>
       </tr>
     );
@@ -57,10 +56,10 @@ export default function DisplayTransactions({ accounts }: Prop): ReactElement {
       <table>
         <thead>
           <tr>
-            <th>account name</th>
+            {/* <th>account name</th> */}
             <th>date</th>
-            <th>merchant_name</th>
-            <th>name</th>
+            <th>Name</th>
+            {/* <th>name</th> */}
             <th>category</th>
             <th>amount</th>
           </tr>

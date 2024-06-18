@@ -79,10 +79,13 @@ export const getTransactions = async (signal): Promise<Transaction[]> => {
     return response.json();
 }
 
-export const fetchSession = async (signal) : Promise<any> => {
+export const fetchSession = async (phone, signal) : Promise<any> => {
     const url: any = new URL(`${API_BASE_URL}/session`);
     const response = await fetch(url, {
-        method: "GET",
+        method: "POST",
+        body: JSON.stringify({
+            phone: phone
+        }),
         headers: {
             'Content-Type': 'application/json',
         },
@@ -91,8 +94,10 @@ export const fetchSession = async (signal) : Promise<any> => {
     })
     if (response.status == 200) {
         const data = await response.json()
-        return {data: data}
+        return {plaidLoginRequired: false}
+    } else if (response.status == 401 ){
+        return {plaidLoginRequired: true }
     } else {
-        return {error: "Unauthorized User"}
+        return { error: "Invalid Request" }
     }
 }
