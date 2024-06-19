@@ -21,6 +21,7 @@ const { syncTransactions } = require("./transactions");
 const { plaidClient } = require("../plaid");
 const { generateLinkToken, exchangePublicToken } = require("./tokens");
 const { SandboxItemFireWebhookRequestWebhookCodeEnum } = require("plaid");
+const { computeSmartInitialBudget } = require("../utils/calculateBudget");
 
 async function generateLinkTokenController(request, response, next) {
   const { timezoneOffset } = request.body;

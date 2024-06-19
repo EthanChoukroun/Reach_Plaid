@@ -12,6 +12,7 @@ const { sendBudgetMessage } = require("../twilio");
 const { SimpleTransaction } = require("../utils/SimpleTransactionObject");
 const path = require("path");
 const { spawn } = require("child_process");
+const { computeSmartInitialBudget } = require("../utils/calculateBudget");
 
 async function fetchNewSyncData(accessToken, initialCursor, retriesLeft = 3) {
   const allData = {
@@ -134,7 +135,8 @@ async function syncTransactions(itemId) {
   );
 
   const transactions = await getTransactionsForUser(userId);
-  const { smartBudget } = await getBudget(transactions);
+  // const { smartBudget } = await getBudget(transactions);
+  const { smartBudget } = computeSmartInitialBudget(transactions);
   await saveCursorAndBudgetForItem(allData.nextCursor, smartBudget, itemId);
   const { user } = await getUserRecord(userId);
   await sendBudgetMessage(smartBudget, user.phone);

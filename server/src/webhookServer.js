@@ -43,12 +43,11 @@ function handleTxnWebhook(code, requestBody) {
   switch (code) {
     case "SYNC_UPDATES_AVAILABLE":
       syncTransactions(requestBody.item_id);
-      console.log(requestBody);
       break;
     // If we're using sync, we don't really need to concern ourselves with the
     // other transactions-related webhooks
     default:
-      console.log(`Can't handle webhook code ${code}`);
+      // console.log(`Can't handle webhook code ${code}`);
       break;
   }
 }
