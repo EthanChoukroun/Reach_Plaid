@@ -30,6 +30,7 @@ export interface Transaction {
     merchant_name: string,
     name: string,
     category: Array<string>,
+    account_name: string
     // alternative way:
     // category: string[],
     amount: number

@@ -18,6 +18,7 @@ async function fetchNewSyncData(accessToken, initialCursor, retriesLeft = 3) {
     added: [],
     removed: [],
     modified: [],
+    accounts: {},
     nextCursor: initialCursor,
   };
 
@@ -36,6 +37,11 @@ async function fetchNewSyncData(accessToken, initialCursor, retriesLeft = 3) {
         cursor: allData.nextCursor,
       });
       const newData = results.data;
+
+      newData.accounts.forEach((acc) => {
+        allData.accounts[acc.account_id] = acc.name;
+      });
+
       allData.added = allData.added.concat(newData.added);
       allData.modified = allData.modified.concat(newData.modified);
       allData.removed = allData.removed.concat(newData.removed);
@@ -99,7 +105,7 @@ async function syncTransactions(itemId) {
   await Promise.all(
     allData.added.map(async (txnObj) => {
       const result = await addNewTransaction(
-        SimpleTransaction.fromPlaidTransaction(txnObj, userId)
+        SimpleTransaction.fromPlaidTransaction(txnObj, userId, allData.accounts)
       );
       if (result) {
         summary.added += result.changes;
@@ -110,7 +116,7 @@ async function syncTransactions(itemId) {
   await Promise.all(
     allData.modified.map(async (txnObj) => {
       const result = await modifyExistingTransaction(
-        SimpleTransaction.fromPlaidTransaction(txnObj, userId)
+        SimpleTransaction.fromPlaidTransaction(txnObj, userId, allData.accounts)
       );
       if (result) {
         summary.modified += result.changes;

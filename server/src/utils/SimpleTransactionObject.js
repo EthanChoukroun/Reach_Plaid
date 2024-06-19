@@ -10,10 +10,12 @@ class SimpleTransaction {
     category,
     date,
     authorizedDate,
-    name,
+    merchantName,
     amount,
     currencyCode,
-    pendingTransactionId
+    pendingTransactionId,
+    name,
+    accountName
   ) {
     this.id = id;
     this.userId = userId;
@@ -21,13 +23,15 @@ class SimpleTransaction {
     this.category = category;
     this.date = date;
     this.authorizedDate = authorizedDate;
-    this.name = name;
+    this.merchantName = merchantName;
     this.amount = amount;
     this.currencyCode = currencyCode;
     this.pendingTransactionId = pendingTransactionId;
+    this.name = name;
+    this.accountName = accountName;
   }
 
-  static fromPlaidTransaction(txnObj, userId) {
+  static fromPlaidTransaction(txnObj, userId, accounts) {
     return new SimpleTransaction(
       txnObj.transaction_id,
       userId,
@@ -35,10 +39,12 @@ class SimpleTransaction {
       txnObj.personal_finance_category.primary,
       txnObj.date,
       txnObj.authorized_date,
-      txnObj.merchant_name ?? txnObj.name,
+      txnObj.merchant_name || "N/A",
       txnObj.amount,
       txnObj.iso_currency_code,
-      txnObj.pending_transaction_id
+      txnObj.pending_transaction_id,
+      txnObj.name || "N/A",
+      accounts[txnObj.account_id] || "N/A"
     );
   }
 }
