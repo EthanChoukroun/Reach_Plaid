@@ -101,3 +101,21 @@ export const fetchSession = async (phone, signal) : Promise<any> => {
         return { error: "Invalid Request" }
     }
 }
+
+export const deleteSession= async(signal) : Promise<any> => {
+    const url: any = new URL(`${API_BASE_URL}/deletesession`);
+    const response = await fetch(url, {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: "include",
+        signal
+    })
+    if (response.status == 200) {
+        const data = await response.json();
+        return data
+    } else {
+        return {error: "error logging out"};
+    }
+}

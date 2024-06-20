@@ -12,6 +12,8 @@ const {
   getTransactionsForUser,
   getItemsAndAccessTokensForUser,
   getItemInfo,
+  deleteItem,
+  deleteAllUserTransactions,
 } = require("../mongoDB/accessTokenSchema");
 const path = require("path");
 const { spawn } = require("child_process");
@@ -238,6 +240,24 @@ async function syncTransactionsController(req, res, next) {
   }
 }
 
+async function deletePlaidSession(req, res, next) {
+  try {
+    const userId = await getLoggedInUserId(req);
+    const items = await getItemsAndAccessTokensForUser(userId);
+    items.map((item) => {
+      (async () => {
+        await plaidClient.itemRemove({ access_token: item.access_token });
+        await deleteItem(item.id);
+      })();
+    });
+    await deleteAllUserTransactions(userId);
+    res.json({ Message: "Successfully deleted Plaid session" });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+}
+
 async function ko(req, res, next) {
   try {
     const result = await plaidClient.sandboxItemFireWebhook({
@@ -258,5 +278,6 @@ module.exports = {
   getTransactions: asyncErrorBoundary(getTransactions),
   checkIfSessionExists: asyncErrorBoundary(checkIfSessionExists),
   syncTransactions: asyncErrorBoundary(syncTransactionsController),
+  deletePlaidSession: asyncErrorBoundary(deletePlaidSession),
   ko: asyncErrorBoundary(ko),
 };

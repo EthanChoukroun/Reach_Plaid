@@ -3,7 +3,7 @@ import Menu from "./layout/Menu";
 import Routing from "./layout/Routing";
 import "./app.css";
 import { fetchSession } from "./utils/api";
-import { Route, Routes } from "react-router";
+import { Route, Routes, useNavigate } from "react-router";
 import UnprotectedComponent from "./layout/UnprotectedComponent";
 import DisplayTransactions from "./money/DisplayTransactions";
 import { useSearchParams } from "react-router-dom";
@@ -11,15 +11,21 @@ import { useSearchParams } from "react-router-dom";
 function App(): ReactElement {
   const [authorisedUser, setAuthorisedUser] = useState<null | boolean>(null);
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
-  useEffect(() => {
+  function fetchUserSession() {
     const abortController = new AbortController();
     let phoneNumber = decodeURIComponent(searchParams.get("phone") || "");
 
     fetchSession(phoneNumber, abortController.signal).then(
       ({ plaidLoginRequired, error }) => {
         if (error) {
-          alert("Invalid Request. Put phone number in params");
+          let sign = window.prompt(
+            "Invalid Request as Phone number is required. Enter your phone number"
+          );
+          if (sign) {
+            navigate(`/?phone=${sign}`);
+          }
         } else {
           if (plaidLoginRequired) {
             setAuthorisedUser(false);
@@ -29,12 +35,19 @@ function App(): ReactElement {
         }
       }
     );
-  }, []);
-  console.log(authorisedUser);
+  }
+
+  useEffect(() => {
+    fetchUserSession();
+    console.log(searchParams);
+  }, [searchParams]);
 
   return (
     <>
-      <Menu authorisedUser={authorisedUser} />
+      <Menu
+        authorisedUser={authorisedUser}
+        setAuthorisedUser={setAuthorisedUser}
+      />
       <Routes>
         <Route
           path="/"

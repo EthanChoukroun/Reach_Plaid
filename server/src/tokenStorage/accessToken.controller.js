@@ -36,7 +36,6 @@ async function create(req, res) {
 
   try {
     const newToken = await token.save();
-    // console.log(process.memoryUsage().heapUsed / 1024 / 1024);
     res.status(201).json(newToken);
   } catch (err) {
     res.status(400).json({ message: err.message });

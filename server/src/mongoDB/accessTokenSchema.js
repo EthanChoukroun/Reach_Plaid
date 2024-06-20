@@ -164,10 +164,19 @@ const addItem = async function (itemId, userId, accessToken, phone) {
       phone: phone,
     });
     const result = await item.save();
-    console.log(result);
     return result;
   } catch (error) {
     console.error("Error adding item:", error);
+    throw error;
+  }
+};
+
+const deleteItem = async function (itemId) {
+  try {
+    const result = await Item.deleteOne({ id: itemId });
+    return result;
+  } catch (error) {
+    console.error("Error deleting item:", error);
     throw error;
   }
 };
@@ -178,7 +187,6 @@ const getItemInfo = async function (itemId) {
       { id: itemId },
       "user_id access_token transaction_cursor"
     );
-    console.log(result);
     return result;
   } catch (error) {
     console.error("Error fetching item info:", error);
@@ -277,12 +285,22 @@ const deleteExistingTransaction = async function (transactionId) {
   }
 };
 
+const deleteAllUserTransactions = async function (userId) {
+  try {
+    const result = await Transaction.deleteMany({ user_id: userId });
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
+
 const getTransactionsForUser = async function (userId) {
   try {
     const results = await Transaction.find({
       user_id: userId,
       is_removed: false,
     })
+      .select("-_id -__v")
       .sort({ date: -1 })
       .exec();
 
@@ -431,4 +449,6 @@ module.exports = {
   modifyUserBudget,
   getUserRecordFromPhone,
   updateItemBudget,
+  deleteItem,
+  deleteAllUserTransactions,
 };

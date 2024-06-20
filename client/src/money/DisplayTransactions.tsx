@@ -22,18 +22,11 @@ export default function DisplayTransactions({ accounts }: Prop): ReactElement {
   }, []);
 
   const transactionsRows = transactions.map((transaction: Transaction) => {
-    const {
-      transaction_id,
-      date,
-      merchant_name,
-      account_name,
-      name,
-      category,
-      amount,
-    } = transaction;
+    const { id, date, merchant_name, account_name, name, category, amount } =
+      transaction;
 
     return (
-      <tr key={transaction_id}>
+      <tr key={id}>
         <td>{account_name}</td>
         <td className="no-wrap">{date}</td>
         <td>{merchant_name ? merchant_name : "N/A"}</td>

@@ -17,7 +17,6 @@ const webhookServer = webhookApp.listen(WEBHOOK_PORT, function () {
 
 webhookApp.post("/server/receive_webhook", async (req, res, next) => {
   try {
-    console.log("**INCOMING WEBHOOK**");
     const product = req.body.webhook_type;
     const code = req.body.webhook_code;
 

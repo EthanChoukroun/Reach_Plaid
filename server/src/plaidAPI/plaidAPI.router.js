@@ -21,6 +21,10 @@ router
 
 router.route("/sync").post(controller.syncTransactions).all(methodNotAllowed);
 router.route("/test").post(controller.ko).all(methodNotAllowed);
+router
+  .route("/deletesession")
+  .post(controller.deletePlaidSession)
+  .all(methodNotAllowed);
 // router.route('/balance/get').get(controller.getBalance).all(methodNotAllowed);
 
 module.exports = router;

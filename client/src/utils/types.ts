@@ -25,7 +25,7 @@ export interface SetAccessTokenObj {
 
 export interface Transaction {
     account_id: string,
-    transaction_id: string,
+    id: string,
     date: Date,
     merchant_name: string,
     name: string,

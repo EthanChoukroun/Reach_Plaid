@@ -48,9 +48,6 @@ async function fetchNewSyncData(accessToken, initialCursor, retriesLeft = 3) {
       allData.removed = allData.removed.concat(newData.removed);
       allData.nextCursor = newData.next_cursor;
       keepGoing = newData.has_more;
-      console.log(
-        `Added: ${newData.added.length} Modified: ${newData.modified.length} Removed: ${newData.removed.length} `
-      );
     } while (keepGoing === true);
     return allData;
   } catch (error) {
@@ -81,7 +78,6 @@ async function getBudget(transactions) {
       } else {
         try {
           const parsedResult = JSON.parse(result);
-          console.log(parsedResult);
           resolve(parsedResult);
         } catch (err) {
           reject({ Error: "error" });
