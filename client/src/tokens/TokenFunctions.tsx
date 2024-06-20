@@ -12,7 +12,6 @@ import {
   PlaidLinkError,
   PlaidLinkOnExitMetadata,
 } from "react-plaid-link";
-import { useSearchParams } from "react-router-dom";
 
 interface Prop {
   setAccessTokenObj: any;
@@ -24,7 +23,7 @@ export default function TokenFunctions({
   setAuthorisedUser,
 }: Prop): ReactElement {
   const [linkToken, setLinkToken] = useState<string>("");
-  const [searchParams] = useSearchParams();
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -44,19 +43,14 @@ export default function TokenFunctions({
         metadata: PlaidLinkOnSuccessMetadata
       ): Promise<() => void> => {
         const abortController = new AbortController();
-        let phoneNumber = decodeURIComponent(searchParams.get("phone") || "");
-        if (phoneNumber) {
-          await exchangeForAccessToken(
-            public_token,
-            phoneNumber,
-            abortController.signal
-          )
-            .then(async (accessTokenObj) => {
-              setAuthorisedUser(true);
-              window.location.href = "https://wa.me/14155238886";
-            })
-            .catch((error) => console.error(error));
-        }
+        setLoading(true);
+        await exchangeForAccessToken(public_token, abortController.signal)
+          .then(async (accessTokenObj) => {
+            setLoading(false);
+            setAuthorisedUser(true);
+            window.location.href = "https://wa.me/14155238886";
+          })
+          .catch((error) => console.error(error));
         return () => abortController.abort();
       },
       []
@@ -107,6 +101,7 @@ export default function TokenFunctions({
           Connect a bank account
         </button>
         <Instructions />
+        {loading && <div id="overlay">Fetching Transactions ...</div>}
       </>
     );
   };

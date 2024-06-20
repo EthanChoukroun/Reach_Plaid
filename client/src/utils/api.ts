@@ -20,7 +20,7 @@ export const generateLinkToken = async (signal): Promise<string> => {
 }
 
 // adjust to use api endpoint found within documentation...
-export const exchangeForAccessToken = async (public_token: string, phoneNumber: string, signal): Promise<AccessTokenObj> => {
+export const exchangeForAccessToken = async (public_token: string,  signal): Promise<AccessTokenObj> => {
     const url: any = new URL(`${API_BASE_URL}/item/public_token/exchange`);
     // const url: any = new URL(`${API_BASE_URL}/api/set_access_token`);
     const response = await fetch(url, {
@@ -28,7 +28,7 @@ export const exchangeForAccessToken = async (public_token: string, phoneNumber: 
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({public_token, phoneNumber}),
+        body: JSON.stringify({public_token}),
         credentials: "include",
         signal
     })
