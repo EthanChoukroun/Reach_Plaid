@@ -1,7 +1,8 @@
 const express = require("express");
-const app = require('./app');
+const app = require("./app");
 // const mongoose = require('mongoose');
-const path = require('path');
+const path = require("path");
+const { getWebhookServer } = require("./webhookServer");
 // require("dotenv").config();
 require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 
@@ -17,4 +18,6 @@ const { PORT = 5000 } = process.env;
 //     console.log(`Listening on Port ${PORT}!`);
 // }
 // app.listen(PORT, listener)
-app.listen(PORT, () => console.log(`Server started on Port: ${PORT}`))
+app.listen(PORT, () => console.log(`Server started on Port: ${PORT}`));
+
+const webhookServer = getWebhookServer();

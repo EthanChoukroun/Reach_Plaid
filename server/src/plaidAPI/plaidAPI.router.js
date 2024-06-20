@@ -16,7 +16,14 @@ router
   .all(methodNotAllowed);
 router
   .route("/session")
-  .get(controller.checkIfSessionExists)
+  .post(controller.checkIfSessionExists)
+  .all(methodNotAllowed);
+
+router.route("/sync").post(controller.syncTransactions).all(methodNotAllowed);
+router.route("/test").post(controller.ko).all(methodNotAllowed);
+router
+  .route("/deletesession")
+  .post(controller.deletePlaidSession)
   .all(methodNotAllowed);
 // router.route('/balance/get').get(controller.getBalance).all(methodNotAllowed);
 

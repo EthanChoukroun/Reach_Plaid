@@ -20,7 +20,7 @@ export const generateLinkToken = async (signal): Promise<string> => {
 }
 
 // adjust to use api endpoint found within documentation...
-export const exchangeForAccessToken = async (public_token: string, phoneNumber: string, signal): Promise<AccessTokenObj> => {
+export const exchangeForAccessToken = async (public_token: string,  signal): Promise<AccessTokenObj> => {
     const url: any = new URL(`${API_BASE_URL}/item/public_token/exchange`);
     // const url: any = new URL(`${API_BASE_URL}/api/set_access_token`);
     const response = await fetch(url, {
@@ -28,7 +28,7 @@ export const exchangeForAccessToken = async (public_token: string, phoneNumber: 
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({public_token, phoneNumber}),
+        body: JSON.stringify({public_token}),
         credentials: "include",
         signal
     })
@@ -79,10 +79,13 @@ export const getTransactions = async (signal): Promise<Transaction[]> => {
     return response.json();
 }
 
-export const fetchSession = async (signal) : Promise<any> => {
+export const fetchSession = async (phone, signal) : Promise<any> => {
     const url: any = new URL(`${API_BASE_URL}/session`);
     const response = await fetch(url, {
-        method: "GET",
+        method: "POST",
+        body: JSON.stringify({
+            phone: phone
+        }),
         headers: {
             'Content-Type': 'application/json',
         },
@@ -91,8 +94,28 @@ export const fetchSession = async (signal) : Promise<any> => {
     })
     if (response.status == 200) {
         const data = await response.json()
-        return {data: data}
+        return {plaidLoginRequired: false}
+    } else if (response.status == 401 ){
+        return {plaidLoginRequired: true }
     } else {
-        return {error: "Unauthorized User"}
+        return { error: "Invalid Request" }
+    }
+}
+
+export const deleteSession= async(signal) : Promise<any> => {
+    const url: any = new URL(`${API_BASE_URL}/deletesession`);
+    const response = await fetch(url, {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: "include",
+        signal
+    })
+    if (response.status == 200) {
+        const data = await response.json();
+        return data
+    } else {
+        return {error: "error logging out"};
     }
 }

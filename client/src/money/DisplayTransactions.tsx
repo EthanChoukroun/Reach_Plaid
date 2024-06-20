@@ -9,7 +9,6 @@ interface Prop {
 export default function DisplayTransactions({ accounts }: Prop): ReactElement {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  console.log(transactions);
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -23,30 +22,16 @@ export default function DisplayTransactions({ accounts }: Prop): ReactElement {
   }, []);
 
   const transactionsRows = transactions.map((transaction: Transaction) => {
-    const {
-      account_id,
-      transaction_id,
-      date,
-      merchant_name,
-      name,
-      category,
-      amount,
-    } = transaction;
-
-    // should always find account - is there a way to remove the undefined?
-    const accountFound: Account | undefined = accounts.find(
-      (account: Account) => {
-        return account.account_id === account_id;
-      }
-    );
+    const { id, date, merchant_name, account_name, name, category, amount } =
+      transaction;
 
     return (
-      <tr key={transaction_id}>
-        <td>{accountFound ? accountFound.name : "N/A"}</td>
+      <tr key={id}>
+        <td>{account_name}</td>
         <td className="no-wrap">{date}</td>
         <td>{merchant_name ? merchant_name : "N/A"}</td>
         <td>{name}</td>
-        <td>{category.join(", ")}</td>
+        <td>{category}</td>
         <td className="no-wrap">${amount.toFixed(2)}</td>
       </tr>
     );
@@ -57,10 +42,11 @@ export default function DisplayTransactions({ accounts }: Prop): ReactElement {
       <table>
         <thead>
           <tr>
-            <th>account name</th>
+            <th>Account Name</th>
+
             <th>date</th>
-            <th>merchant_name</th>
-            <th>name</th>
+            <th>Merchant Name</th>
+            <th>Name</th>
             <th>category</th>
             <th>amount</th>
           </tr>

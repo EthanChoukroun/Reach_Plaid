@@ -1,100 +1,72 @@
 require("dotenv").config();
-const accessTokenController = require("../tokenStorage/accessToken.controller");
 const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 const getLastThirtyDaysDates = require("../utils/getThirtyDays");
 const { v4: uuidv4 } = require("uuid");
-const AccessToken = require("../mongoDB/accessTokenSchema");
+const {
+  AccessToken,
+  getItemIdsForUser,
+  getUserRecordFromPhone,
+  addUser,
+  getUserRecord,
+  getItemInfoForUser,
+  getTransactionsForUser,
+  getItemsAndAccessTokensForUser,
+  getItemInfo,
+  deleteItem,
+  deleteAllUserTransactions,
+} = require("../mongoDB/accessTokenSchema");
 const path = require("path");
 const { spawn } = require("child_process");
-const {
-  PORT,
-  PLAID_CLIENT_ID,
-  PLAID_SECRET,
-  PLAID_ENV,
-  PLAID_PRODUCTS,
-  PLAID_COUNTRY_CODES,
-  PLAID_REDIRECT_URI,
-} = process.env;
-
-const { Configuration, PlaidApi, PlaidEnvironments } = require("plaid");
 const { sendBudgetMessage } = require("../twilio");
+const { getLoggedInUserId } = require("../utils/getLoggedInUser");
+const { syncTransactions } = require("./transactions");
+const { plaidClient } = require("../plaid");
+const { generateLinkToken, exchangePublicToken } = require("./tokens");
+const { SandboxItemFireWebhookRequestWebhookCodeEnum } = require("plaid");
+const { computeSmartInitialBudget } = require("../utils/calculateBudget");
 
-const configuration = new Configuration({
-  basePath: PlaidEnvironments[PLAID_ENV],
-  baseOptions: {
-    headers: {
-      "PLAID-CLIENT-ID": PLAID_CLIENT_ID,
-      "PLAID-SECRET": PLAID_SECRET,
-      "Plaid-Version": "2020-09-14",
-    },
-  },
-});
-
-const plaidClient = new PlaidApi(configuration);
-
-async function generateLinkToken(request, response, next) {
+async function generateLinkTokenController(request, response, next) {
   const { timezoneOffset } = request.body;
   process.env.TIMEZONE_OFFSET = timezoneOffset;
   Promise.resolve()
     .then(async function () {
-      let sessionId = request.cookies.sessionid;
-      if (!sessionId) {
-        sessionId = uuidv4();
-        response.cookie("sessionid", sessionId, {
-          maxAge: 30 * 24 * 60 * 60 * 1000,
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-        });
-      }
-
-      const configs = {
-        user: {
-          // This should correspond to a unique id for the current user.
-          client_user_id: sessionId,
-        },
-        client_name: "Plaid Quickstart",
-        products: PLAID_PRODUCTS.split(","),
-        country_codes: PLAID_COUNTRY_CODES.split(","),
-        language: "en",
-      };
-      const createTokenResponse = await plaidClient.linkTokenCreate(configs);
-      // prettyPrintResponse(createTokenResponse);
-      response.json(createTokenResponse.data);
+      let sessionId = getLoggedInUserId(request);
+      const responsedata = await generateLinkToken(sessionId);
+      response.json(responsedata);
     })
     .catch(next);
 }
 
-// app.post('/api/set_access_token', function (request, response, next) {
 async function exchangeForAccessToken(request, response, next) {
-  // unsure where this comes from
   const { public_token, phoneNumber } = request.body;
   Promise.resolve()
     .then(async function () {
       try {
-        const tokenResponse = await plaidClient.itemPublicTokenExchange({
-          public_token,
-        });
-        const ACCESS_TOKEN = tokenResponse.data.access_token;
-        const ITEM_ID = tokenResponse.data.item_id;
+        await exchangePublicToken(request);
+        // const tokenResponse = await plaidClient.itemPublicTokenExchange({
+        //   public_token,
+        // });
+        // const ACCESS_TOKEN = tokenResponse.data.access_token;
+        // const ITEM_ID = tokenResponse.data.item_id;
 
-        let transactions = await fetchTransations(ACCESS_TOKEN);
-        let { smartBudget } = await getBudget(transactions);
+        // let transactions = await fetchTransations(ACCESS_TOKEN);
+        // let { smartBudget } = await getBudget(transactions);
 
-        const token = await new AccessToken({
-          access_token: ACCESS_TOKEN,
-          item_id: ITEM_ID,
-          session_id: request.cookies.sessionid,
-          phone: phoneNumber,
-          smart_budget: String(smartBudget),
-        });
+        // const token = await new AccessToken({
+        //   access_token: ACCESS_TOKEN,
+        //   item_id: ITEM_ID,
+        //   session_id: request.cookies.sessionid,
+        //   phone: phoneNumber,
+        //   smart_budget: String(smartBudget),
+        // });
 
-        const newToken = await token.save();
-        await sendBudgetMessage(smartBudget, phoneNumber);
+        // const newToken = await token.save();
+        // await sendBudgetMessage(smartBudget, phoneNumber);
 
         response.json({
-          access_token: ACCESS_TOKEN,
-          item_id: ITEM_ID,
-          phoneNumber: phoneNumber,
+          // access_token: ACCESS_TOKEN,
+          // item_id: ITEM_ID,
+          phoneNumber: "",
           error: null,
         });
       } catch (err) {
@@ -169,7 +141,6 @@ async function fetchTransations(access_token) {
     // transactions and retrieve all available data
     while (transactions.length < total_transactions) {
       const paginatedRequest = {
-        // const paginatedRequest: TransactionsGetRequest = {
         access_token: access_token,
         start_date: thirtyDaysAgoDate,
         end_date: currentDate,
@@ -191,113 +162,122 @@ async function fetchTransations(access_token) {
 async function getTransactions(req, res, next) {
   try {
     let session_id = req.cookies.sessionid;
-    const accessTokenObj = await AccessToken.findOne({
-      session_id,
-    });
-    let transactions = await fetchTransations(accessTokenObj.access_token);
+    const transactions = await getTransactionsForUser(session_id);
     res.json(transactions);
-    // const formattedTransaction = formatTransactions(transactions);
-    // console.log(formattedTransaction);
   } catch (err) {
     console.error(err);
   }
-
-  // const requestBalance = {
-  //   access_token: accessToken,
-  // };
-  // try {
-  //   const responseBalance = await plaidClient.accountsBalanceGet(
-  //     requestBalance
-  //   );
-  //   const accounts = responseBalance.data.accounts;
-  //   const formattedBalance = parseAccountData(accounts);
-  //   // console.log(formattedBalance);
-  // } catch (err) {
-  //   console.log(err);
-  // }
-
-  // const requestUserIncome = {
-  //   client_user_id: process.env.PLAID_CLIENT_ID
-  // };
-  // try {
-  //   const responseUser = await plaidClient.userCreate(requestUserIncome);
-  //   console.log(responseUser)
-  // } catch(err) {
-  //   console.log(err);
-  // };
-
-  // const requestIncome = {
-  //   user_token: responseUser['user_token'],
-  //   options: {
-  //     count: 1,
-  //   },
-  // };
-  // try {
-  //   const responseIncome = await client.creditBankIncomeGet(request)
-  //   console.log(responseIncome)
-  // } catch(err) {
-  //   console.log(err)
-  // }
 }
 
-async function getBudget(transactions) {
-  return new Promise((resolve, reject) => {
-    const budgetScriptPath = path.join(__dirname, "../../smart_budgets.py");
-    const pythonProcess = spawn("python3", [budgetScriptPath]);
-
-    let result = "";
-
-    pythonProcess.stdout.on("data", (data) => {
-      result += data.toString();
-    });
-
-    pythonProcess.stderr.on("data", (data) => {
-      console.error(`stderr: ${data}`);
-      reject({ Error: "error" });
-    });
-
-    pythonProcess.on("close", (code) => {
-      if (code !== 0) {
-        reject({ Error: "error" });
-      } else {
-        try {
-          const parsedResult = JSON.parse(result);
-          console.log(parsedResult);
-          resolve(parsedResult);
-        } catch (err) {
-          reject({ Error: "error" });
-        }
-      }
-    });
-
-    pythonProcess.stdin.write(JSON.stringify(transactions));
-    pythonProcess.stdin.end();
-  });
+async function checkIfItemExists(userId) {
+  const result = await getItemInfoForUser(userId);
+  if (result) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 async function checkIfSessionExists(req, res, next) {
   let session_id = req.cookies.sessionid;
+  const { phone } = req.body;
 
-  if (session_id) {
-    const accessTokenObj = await AccessToken.findOne({
-      session_id: session_id,
-    });
-    if (accessTokenObj) {
-      res.status(200).json({
-        // phone: accessTokenObj.phone,
-        sessionid: accessTokenObj.session_id,
+  if (phone) {
+    const { user, error } = await getUserRecordFromPhone(phone);
+    if (user) {
+      res.cookie("sessionid", user.id, {
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
       });
+
+      const itemExists = await checkIfItemExists(user.id);
+      if (itemExists) {
+        res.status(200).json({ message: "Item exists" });
+      } else {
+        res.status(401).json({ message: "Item doesn't exist" });
+      }
     } else {
-      res.status(401).send("Un");
+      const userId = uuidv4();
+      const result = await addUser(userId, phone);
+      res.cookie("sessionid", userId, {
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+      });
+      res.status(401).json({ message: "Item doesn't exist" });
     }
   } else {
-    res.status(401).send("Un");
+    if (session_id) {
+      const { user } = await getUserRecord(session_id);
+      if (user) {
+        const itemExists = await checkIfItemExists(user.id);
+        if (itemExists) {
+          res.status(200).json({ message: "Item exists" });
+        } else {
+          res.status(401).json({ message: "Item doesn't exist" });
+        }
+      } else {
+        res.status(400).json({ error: "Invalid request" });
+      }
+    } else {
+      res.status(400).json({ error: "Invalid request" });
+    }
+  }
+}
+
+async function syncTransactionsController(req, res, next) {
+  try {
+    const userId = getLoggedInUserId(req);
+    const items = await getItemIdsForUser(userId);
+    const fullResults = await Promise.all(
+      items.map(async (item) => await syncTransactions(item.id))
+    );
+    res.json({ completeResults: fullResults });
+  } catch (error) {
+    console.log(`Running into an error!`);
+    next(error);
+  }
+}
+
+async function deletePlaidSession(req, res, next) {
+  try {
+    const userId = await getLoggedInUserId(req);
+    const items = await getItemsAndAccessTokensForUser(userId);
+    items.map((item) => {
+      (async () => {
+        await plaidClient.itemRemove({ access_token: item.access_token });
+        await deleteItem(item.id);
+      })();
+    });
+    await deleteAllUserTransactions(userId);
+    res.json({ Message: "Successfully deleted Plaid session" });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+}
+
+async function ko(req, res, next) {
+  try {
+    const result = await plaidClient.sandboxItemFireWebhook({
+      webhook_code: "SYNC_UPDATES_AVAILABLE",
+      access_token: "",
+    });
+    // console.log(result.data);
+    res.json(result.data);
+  } catch (error) {
+    console.log(error);
+    next(error);
   }
 }
 
 module.exports = {
-  generateLinkToken: asyncErrorBoundary(generateLinkToken),
+  generateLinkToken: asyncErrorBoundary(generateLinkTokenController),
   exchangeForAccessToken: asyncErrorBoundary(exchangeForAccessToken),
   getTransactions: asyncErrorBoundary(getTransactions),
   checkIfSessionExists: asyncErrorBoundary(checkIfSessionExists),
+  syncTransactions: asyncErrorBoundary(syncTransactionsController),
+  deletePlaidSession: asyncErrorBoundary(deletePlaidSession),
+  ko: asyncErrorBoundary(ko),
 };

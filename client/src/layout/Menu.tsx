@@ -1,7 +1,23 @@
 import React, { ReactElement, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { deleteSession } from "../utils/api";
 
-export default function Menu({ authorisedUser }): ReactElement {
+export default function Menu({
+  authorisedUser,
+  setAuthorisedUser,
+}): ReactElement {
+  const navigate = useNavigate();
+
+  function deleteSessionHandler() {
+    const abortController = new AbortController();
+    deleteSession(abortController.signal)
+      .then((res) => {
+        setAuthorisedUser(false);
+        navigate("/");
+      })
+      .catch();
+  }
+
   return (
     <header>
       <Link to="/">
@@ -13,9 +29,20 @@ export default function Menu({ authorisedUser }): ReactElement {
             <Link to="/">Home</Link>
           </li>
           {authorisedUser && (
-            <li>
-              <Link to="/transactions">View Transactions</Link>
-            </li>
+            <>
+              <li>
+                <Link to="/transactions">View Transactions</Link>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  className="logout"
+                  onClick={() => deleteSessionHandler()}
+                >
+                  Logout session
+                </button>
+              </li>
+            </>
           )}
         </ul>
       </nav>

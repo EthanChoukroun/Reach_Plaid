@@ -1,8 +1,8 @@
 // Import the Twilio module
 const twilio = require("twilio");
 
-let accountSid = "";
-let authToken = "";
+let accountSid = process.env.TWILIO_ACCOUNTSID;
+let authToken = process.env.TWILIO_AUTHTOKEN;
 // Create a Twilio client
 const client = new twilio(accountSid, authToken);
 
