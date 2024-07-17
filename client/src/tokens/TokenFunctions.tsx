@@ -89,7 +89,7 @@ export default function TokenFunctions({
       console.log("Button disabled. Reloading page...");
       window.location.reload();
     }
-
+    
     return (
       <>
         <button
@@ -109,6 +109,9 @@ export default function TokenFunctions({
     // insert your loading animation here
     <div className="loader"></div>
   ) : (
+    <>
+    <p>Here!</p>
     <PlaidLink token={linkToken} />
+    </>
   );
 }

@@ -67,6 +67,7 @@ export const getBalance = async (signal): Promise<Transaction[]> => {
     return response.json();
 }
 
+
 export const getTransactions = async (signal): Promise<Transaction[]> => {
     const url: any = new URL(`${API_BASE_URL}/transactions/get`);
     const response = await fetch(url, {

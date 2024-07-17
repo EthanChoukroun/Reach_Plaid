@@ -1,3 +1,12 @@
-testRoute.rest
-.vercel
+# Ignore node_modules directory
 node_modules/
+
+# Ignore .env file
+.env
+
+# Ignore Vercel directory (if you don't want to commit it)
+.vercel
+
+# Ignore IDE or editor-specific files
+# For example, if using VS Code, you might have:
+.vscode/

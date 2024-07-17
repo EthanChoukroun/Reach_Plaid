@@ -38,6 +38,21 @@ webhookApp.post("/server/receive_webhook", async (req, res, next) => {
   }
 });
 
+webhookApp.post('/whatsapp', async (req, res) => {
+  const { From, Body } = req.body;
+
+  if (Body.toLowerCase() === 'hey') {
+      const responseMessage = 'Welcome to Reach, here is your Plaid Link: http://www.letsgetreach.com/?phone=' + encodeURIComponent(From);
+      await client.messages.create({
+          from: fromWhatsAppNumber,
+          to: From,
+          body: responseMessage,
+      });
+  }
+
+  res.sendStatus(200);
+});
+
 function handleTxnWebhook(code, requestBody) {
   switch (code) {
     case "SYNC_UPDATES_AVAILABLE":
