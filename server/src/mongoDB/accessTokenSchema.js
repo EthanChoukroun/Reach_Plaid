@@ -40,7 +40,6 @@ const accessTokenSchema = new mongoose.Schema({
 const userSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
   phone: { type: String, unique: true, required: true },
-  sentMessages: { type: Boolean, default: false }, // Add this field
 });
 
 const itemSchema = new mongoose.Schema({
