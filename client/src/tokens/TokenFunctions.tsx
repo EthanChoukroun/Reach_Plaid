@@ -110,7 +110,6 @@ export default function TokenFunctions({
     <div className="loader"></div>
   ) : (
     <>
-    <p>Here!</p>
     <PlaidLink token={linkToken} />
     </>
   );
