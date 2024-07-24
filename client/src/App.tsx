@@ -11,12 +11,13 @@ import { useSearchParams } from "react-router-dom";
 function App(): ReactElement {
   const [authorisedUser, setAuthorisedUser] = useState<null | boolean>(null);
   const [searchParams] = useSearchParams();
+  const [phoneNumber, setPhoneNumber] = useState<string>('')
   const navigate = useNavigate();
 
   function fetchUserSession() {
     const abortController = new AbortController();
     let phoneNumber = decodeURIComponent(searchParams.get("phone") || "");
-
+    setPhoneNumber(phoneNumber)
     fetchSession(phoneNumber, abortController.signal).then(
       ({ plaidLoginRequired, error }) => {
         if (error) {
@@ -53,7 +54,7 @@ function App(): ReactElement {
           path="/"
           element={
             <UnprotectedComponent authorisedUser={authorisedUser}>
-              <Routing setAuthorisedUser={setAuthorisedUser} />
+              <Routing setAuthorisedUser={setAuthorisedUser} phone_number={phoneNumber} />
             </UnprotectedComponent>
           }
         />

@@ -26,12 +26,13 @@ const { SandboxItemFireWebhookRequestWebhookCodeEnum } = require("plaid");
 const { computeSmartInitialBudget } = require("../utils/calculateBudget");
 
 async function generateLinkTokenController(request, response, next) {
-  const { timezoneOffset } = request.body;
+  const { timezoneOffset, phone_number } = request.body;
+  console.log(phone_number)
   process.env.TIMEZONE_OFFSET = timezoneOffset;
   Promise.resolve()
     .then(async function () {
       let sessionId = getLoggedInUserId(request);
-      const responsedata = await generateLinkToken(sessionId);
+      const responsedata = await generateLinkToken(sessionId, phone_number);
       response.json(responsedata);
     })
     .catch(next);

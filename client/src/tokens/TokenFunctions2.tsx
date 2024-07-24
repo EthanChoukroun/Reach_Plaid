@@ -12,12 +12,13 @@ import {
 
 export default function TokenFunctions({
   setAccessTokenObj,
-}: SetAccessTokenObj): ReactElement {
+  phoneNumber
+}): ReactElement {
   const [linkToken, setLinkToken] = useState<string>("");
 
   useEffect(() => {
     const abortController = new AbortController();
-    generateLinkToken(abortController.signal)
+    generateLinkToken(abortController.signal, phoneNumber)
       .then((token: string) => {
         setLinkToken(token);
       })

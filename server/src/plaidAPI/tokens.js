@@ -8,10 +8,11 @@ const { getLoggedInUserId } = require("../utils/getLoggedInUser");
 const { syncTransactions } = require("./transactions");
 const { PLAID_PRODUCTS, PLAID_COUNTRY_CODES, WEBHOOK_URL } = process.env;
 
-async function generateLinkToken(sessionId) {
+async function generateLinkToken(sessionId, phoneNumber) {
   const configs = {
     user: {
       client_user_id: sessionId,
+      phone_number: phoneNumber
     },
     client_name: "Plaid Quickstart",
     products: PLAID_PRODUCTS.split(","),

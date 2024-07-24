@@ -8,7 +8,7 @@ const BASE_URL = process.env.BASE_URL || 'http://localhost:3000'
 const client = new twilio(accountSid, authToken);
 
 // The WhatsApp number you are sending the message from (Twilio number)
-const from = "whatsapp:+14155238886";
+const from = "whatsapp:+15075650337";
 
 // The WhatsApp number you are sending the message to
 const to = "whatsapp:+18649792409";

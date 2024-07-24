@@ -16,18 +16,21 @@ import {
 interface Prop {
   setAccessTokenObj: any;
   setAuthorisedUser: any;
+  phone_number: any;
 }
 
 export default function TokenFunctions({
   setAccessTokenObj,
   setAuthorisedUser,
+  phone_number
 }: Prop): ReactElement {
   const [linkToken, setLinkToken] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
+    console.log(phone_number)
     const abortController = new AbortController();
-    generateLinkToken(abortController.signal)
+    generateLinkToken(abortController.signal, phone_number)
       .then((token: string) => {
         setLinkToken(token);
       })
@@ -48,7 +51,7 @@ export default function TokenFunctions({
           .then(async (accessTokenObj) => {
             setLoading(false);
             setAuthorisedUser(true);
-            window.location.href = "https://wa.me/14155238886";
+            window.location.href = "https://wa.me/15075650337";
           })
           .catch((error) => console.error(error));
         return () => abortController.abort();
