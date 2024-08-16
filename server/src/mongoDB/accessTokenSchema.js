@@ -123,6 +123,16 @@ const addUser = async function (userId, phone) {
   }
 };
 
+const findUserByPhone = async function (phone) {
+  try {
+    const result = await User.find({ phone: phone });
+    return result;
+  } catch (error) {
+    console.error("Error adding user:", error);
+    throw error;
+  }
+};
+
 const getUserList = async function () {
   try {
     const result = await User.find({}, "id username");
@@ -303,7 +313,6 @@ const getTransactionsForUser = async function (userId) {
       .select("-_id -__v")
       .sort({ date: -1 })
       .exec();
-
     return results;
   } catch (error) {
     console.error(
@@ -451,4 +460,5 @@ module.exports = {
   updateItemBudget,
   deleteItem,
   deleteAllUserTransactions,
+  findUserByPhone
 };

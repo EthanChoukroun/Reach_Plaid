@@ -18,12 +18,13 @@ function computeSmartInitialBudget(data) {
 
   const monthlyExpenses = groupByMonth(expenses);
   const monthlyIncome = groupByMonth(income);
-
+  console.log(monthlyExpenses)
+  console.log(monthlyIncome)
   const months = Object.keys(monthlyIncome)
     .concat(Object.keys(monthlyExpenses))
     .filter((value, index, self) => self.indexOf(value) === index)
     .sort();
-
+  console.log(months)
   const monthlyDashboard = months.map((month) => {
     const totalIncome = monthlyIncome[month] || 0;
     const totalExpenses = monthlyExpenses[month] || 0;
@@ -35,6 +36,8 @@ function computeSmartInitialBudget(data) {
       NetIncome: netIncome,
     };
   });
+
+  console.log(monthlyDashboard)
 
   const sortedExpenses = Object.values(monthlyExpenses)
     .map(Math.abs)
@@ -61,6 +64,7 @@ function computeSmartInitialBudget(data) {
   const specificMonth = Object.keys(monthlyExpenses).find(
     (month) => Math.abs(monthlyExpenses[month]) === secondLowestExpense
   );
+  console.log(specificMonth)
   const [year, month] = specificMonth.split("-").map(Number);
   const daysInMonth = new Date(year, month, 0).getDate();
   const smartBudget =
@@ -70,7 +74,7 @@ function computeSmartInitialBudget(data) {
     potentialSavingsYearly: potentialSavingsYearly,
     smartBudget: smartBudget,
   };
-
+  console.log(result)
   return result;
 }
 

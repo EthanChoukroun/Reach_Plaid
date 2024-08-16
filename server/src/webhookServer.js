@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const { syncTransactions } = require("./plaidAPI/transactions");
-
+const {flow1} = require('./twilio')
 const WEBHOOK_PORT = process.env.WEBHOOK_PORT || 8001;
 
 const webhookApp = express();
@@ -19,7 +19,6 @@ webhookApp.post("/server/receive_webhook", async (req, res, next) => {
   try {
     const product = req.body.webhook_type;
     const code = req.body.webhook_code;
-
     // TODO (maybe): Verify webhook
     switch (product) {
       case "ITEM":
@@ -35,6 +34,16 @@ webhookApp.post("/server/receive_webhook", async (req, res, next) => {
     res.json({ status: "received" });
   } catch (error) {
     next(error);
+  }
+});
+
+webhookApp.post('/whatsapp', async (req, res) => {
+  try {
+    const { From, Body } = req.body;
+    await flow1(From)
+    res.sendStatus(200); 
+  } catch {
+
   }
 });
 

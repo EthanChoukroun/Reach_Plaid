@@ -8,7 +8,7 @@ import { getTransactions, storeAccessToken } from "../utils/api";
 import { AccessTokenObj, Account, Transaction } from "../utils/types";
 
 // function Routes() {
-function Routing({ setAuthorisedUser }): ReactElement {
+function Routing({ setAuthorisedUser, phone_number }): ReactElement {
   const [accessTokenObj, setAccessTokenObj] = useState<AccessTokenObj>(
     {} as AccessTokenObj
   );
@@ -37,6 +37,7 @@ function Routing({ setAuthorisedUser }): ReactElement {
       <TokenFunctions
         setAccessTokenObj={setAccessTokenObj}
         setAuthorisedUser={setAuthorisedUser}
+        phone_number={phone_number}
       />
     </main>
   );

@@ -3,15 +3,16 @@ const API_BASE_URL: string = process.env.REACT_APP_API_BASE_URL || "http://local
 const headers = new Headers();
 headers.append("Content-Type", "application/json");
 
-export const generateLinkToken = async (signal): Promise<string> => {
+export const generateLinkToken = async (signal, phone_number): Promise<string> => {
     // deployed Vercel application cannot properly calculate timezone offset from server
+    console.log(phone_number)
     const timezoneOffset = new Date().getTimezoneOffset() * 60000;
     const url: any = new URL(`${API_BASE_URL}/link/token/create`);
     // const url = new URL(`${API_BASE_URL}/api/create_link_token`);
     const response = await fetch(url, {
         method: "POST",
         headers,
-        body: JSON.stringify({ timezoneOffset }),
+        body: JSON.stringify({ timezoneOffset, phone_number }),
         credentials: "include",
         signal
     });
@@ -66,6 +67,7 @@ export const getBalance = async (signal): Promise<Transaction[]> => {
     const response = await fetch(url, options);
     return response.json();
 }
+
 
 export const getTransactions = async (signal): Promise<Transaction[]> => {
     const url: any = new URL(`${API_BASE_URL}/transactions/get`);
